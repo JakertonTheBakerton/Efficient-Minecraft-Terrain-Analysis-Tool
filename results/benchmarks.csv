@@ -1,0 +1,9 @@
+basic,per_region_roughness,989.5300072999671 (1 region)
+basic,biome_diversity,17.532508499978576 (9 regions)
+basic,air_ratio,2.2282131000538357 (1 chunk)
+basic,chunk_entropy,1.94843500002753 (1 chunk)
+vectorized,per_region_roughness,64.45593459997326 (9 regions)
+vectorised,chunk_entropy,64.18345320003573 (9 regions, 9216 chunks)
+vectorised,air_ratio,244.34356899990235 (9 regions, 9216 chunks)
+basic,biome_diversity,16.788746800040826 (9 regions)
+vectorized,per_region_roughness,56.20701510000072
