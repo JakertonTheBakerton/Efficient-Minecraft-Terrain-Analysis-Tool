@@ -4,7 +4,7 @@ A performance-focused analysis of Minecraft world generation, built to measure t
 
 The project has two goals, roughly equal in weight:
 1. Quantify terrain properties (block-type diversity, air/solid/liquid composition, surface roughness, biome diversity) across a real Minecraft world.
-2. Demonstrate a measured, optimisation journey — naive Python → vectorised NumPy — with real timing data.
+2. Demonstrate a measured optimisation journey — naive Python → vectorised NumPy — with real timing data.
 ## Data
 
 - **Minecraft version:** 1.21.1
