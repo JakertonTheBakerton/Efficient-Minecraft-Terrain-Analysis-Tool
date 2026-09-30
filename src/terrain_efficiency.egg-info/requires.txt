@@ -1,0 +1,8 @@
+anvil-parser2
+numpy
+pandas
+plotly
+
+[dev]
+pytest
+ruff
