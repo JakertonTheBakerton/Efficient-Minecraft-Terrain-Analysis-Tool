@@ -3,13 +3,44 @@ import numpy as np
 from terrain_efficiency.cat import block_categories
 
 
-def unpack_indices(long_value, bits_per_index, indices_per_long):
-    mask = (1 << bits_per_index) - 1
-    indices = []
-    for i in range(indices_per_long):
-        index = (long_value >> (i * bits_per_index)) & mask
-        indices.append(index)
-    return indices
+def discover_regions(data_dir="data/raw", max_regions=32):
+    """Finds .mca files, parses coordinates, enforces the limit, and checks rectangularity."""
+    files = glob.glob(f"{data_dir}/r.*.*.mca")
+    regions = []
+    for f in files:
+        m = re.search(r"r\.(-?\d+)\.(-?\d+)\.mca", os.path.basename(f))
+        if m:
+            regions.append((int(m.group(1)), int(m.group(2)), f))
+    regions.sort()
+    
+    if not regions:
+        raise ValueError(f"No region files found in {data_dir}")
+    
+    if len(regions) > max_regions:
+        raise ValueError(f"Found {len(regions)} regions, max is {max_regions}")
+    
+    # --- NEW: Rectangular grid check ---
+    unique_rx = sorted(set(rx for rx, rz, f in regions))
+    unique_rz = sorted(set(rz for rx, rz, f in regions))
+    expected_count = len(unique_rx) * len(unique_rz)
+    
+    if len(regions) != expected_count:
+        existing = set((rx, rz) for rx, rz, f in regions)
+        missing = [
+            (rx, rz) 
+            for rx in unique_rx 
+            for rz in unique_rz 
+            if (rx, rz) not in existing
+        ]
+        raise ValueError(
+            f"Region files do not form a complete rectangle.\n"
+            f"Found {len(regions)} regions covering X={unique_rx} and Z={unique_rz} "
+            f"(a solid rectangle would need {expected_count}).\n"
+            f"Missing regions: {missing}\n"
+            f"Please add the missing .mca files or remove regions to form a rectangle."
+        )
+    
+    return regions
 
 def get_section_block_ids(chunk, section_y):
     section = chunk.get_section(section_y)
