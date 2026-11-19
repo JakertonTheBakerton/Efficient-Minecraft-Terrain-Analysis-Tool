@@ -2,39 +2,33 @@ import plotly.graph_objects as go
 
 def render_multi_metric_heatmap(metric_grids, x_coords, z_coords, customdata=None, customdata_metric=None):
     """metric_grids: dict of metric_name -> grid (all same shape/coords).
-    customdata: optional array of extra per-cell data, shaped like the grids.
-    customdata_metric: which metric name in metric_grids should use customdata
-    for a richer hover template."""
+    layer_configs: optional dict of metric_name -> {'customdata': array, 'hovertemplate': str}."""
     metric_names = list(metric_grids.keys())
-
+    
+    if layer_configs is None:
+        layer_configs = {}
+    
     fig = go.Figure()
     for i, name in enumerate(metric_names):
-        if name == customdata_metric and customdata is not None:
-            fig.add_trace(go.Heatmap(
-                z=metric_grids[name],
-                x=x_coords,
-                y=z_coords,
-                customdata=customdata,
-                colorscale='Viridis',
-                visible=(i == 0),
-                colorbar=dict(title=name),
-                hovertemplate=(
-                    'Chunk (%{x}, %{y})<br>'
-                    'Air: %{z:.1f}%<br>'
-                    'Solid: %{customdata[0]:.1f}%<br>'
-                    'Liquid: %{customdata[1]:.1f}<br>'
-                    'Cave Air: %{customdata[2]:.1f}<extra></extra>'
-                )
-            ))
-        else:
-            fig.add_trace(go.Heatmap(
-                z=metric_grids[name],
-                x=x_coords,
-                y=z_coords,
-                colorscale='Viridis',
-                visible=(i == 0),
-                colorbar=dict(title=name)
-            ))
+        config = layer_configs.get(name, {})
+        
+        # Start with the base arguments
+        trace_args = dict(
+            z=metric_grids[name],
+            x=x_coords,
+            y=z_coords,
+            colorscale='Viridis',
+            visible=(i == 0),
+            colorbar=dict(title=name)
+        )
+        
+        # Add customdata and hovertemplate if this layer has them
+        if 'customdata' in config:
+            trace_args['customdata'] = config['customdata']
+        if 'hovertemplate' in config:
+            trace_args['hovertemplate'] = config['hovertemplate']
+            
+        fig.add_trace(go.Heatmap(**trace_args))
 
     buttons = []
     for i, name in enumerate(metric_names):
